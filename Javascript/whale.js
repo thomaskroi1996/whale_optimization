@@ -1,12 +1,9 @@
-const POP_SIZE = 1000;
-const DIM = 2;
-const LOWER_BOUND = 300.0;
-const UPPER_BOUND = 500.0;
-
 class Whale {
   constructor() {
     this.position = [];
     this.fitness = Infinity;
+    this.color = [255, 255, 255];
+    this.history = [];
   }
 
   get_fitness() {
@@ -43,13 +40,18 @@ function find_best_whale(population) {
 }
 
 function random_move(population, whale) {
-  let random_index = Math.floor(random(0, POP_SIZE));
+  let random_index = Math.floor(random(0.0, POP_SIZE));
   let random_whale = population[random_index];
 
   for (let d = 0; d < DIM; d++) {
-    let random_coeff = random(-1.0, 1.0);
+    let random_coeff = random(-0.1, 0.1);
     let D = Math.abs(random_whale.position[d] - whale.position[d]);
     whale.position[d] = random_whale.position[d] - random_coeff * D;
+    if (whale.position[d] < 0) {
+      whale.position[d] = 0;
+    } else if (whale.position[d] > 800) {
+      whale.position[d] = 800;
+    }
   }
   whale.fitness = whale.get_fitness();
 }
@@ -69,9 +71,17 @@ function spiral_move(best_whale, whale) {
 function encircle_prey(whale, best_whale, a) {
   for (let d = 0; d < DIM; d++) {
     let A = random(-a, a);
-    let C = random(0, 2);
+    let C = random(0, 2.0);
     let D = Math.abs(C * best_whale.position[d] - whale.position[d]);
     whale.position[d] = best_whale.position[d] - A * D;
   }
   whale.fitness = whale.get_fitness();
+}
+
+function coloring(whale, best_fitness) {
+  let fitness_ratio = best_fitness / whale.fitness;
+  let r = Math.floor(255 * fitness_ratio);
+  let g = Math.floor(246 * fitness_ratio);
+  let b = Math.floor(128 * fitness_ratio);
+  whale.color = [r, g, b];
 }
